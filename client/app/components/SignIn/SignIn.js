@@ -1,10 +1,18 @@
 import React, { Component } from "react";
 import "whatwg-fetch";
 import { getFromStorage, setInStorage } from "../../utils/storage";
+import { Button, Link, Typography } from "@material-ui/core";
+import TextField from "@material-ui/core/TextField";
+import { makeStyles } from "@material-ui/core/styles";
 
 const localStorageObjectName = "login_system_storage";
 
-class Home extends Component {
+const textFieldStyling = {
+  margin: 8
+};
+
+// The reason I use all arrow functions is b/c you don't have to bind them!
+class SignIn extends Component {
   constructor(props) {
     super(props);
 
@@ -19,32 +27,9 @@ class Home extends Component {
       signUpLastName: "",
       signUpEmail: "",
       signUpPassword: "",
-      signUpError: ""
+      signUpError: "",
+      showSignIn: true
     };
-
-    // Bind the functions so React can use them
-    this.onTextboxChangeSignInEmail = this.onTextboxChangeSignInEmail.bind(
-      this
-    );
-    this.onTextboxChangeSignInPassword = this.onTextboxChangeSignInPassword.bind(
-      this
-    );
-    this.onTextboxChangeSignUpFirstName = this.onTextboxChangeSignUpFirstName.bind(
-      this
-    );
-    this.onTextboxChangeSignUpLastName = this.onTextboxChangeSignUpLastName.bind(
-      this
-    );
-    this.onTextboxChangeSignUpEmail = this.onTextboxChangeSignUpEmail.bind(
-      this
-    );
-    this.onTextboxChangeSignUpPassword = this.onTextboxChangeSignUpPassword.bind(
-      this
-    );
-
-    this.onSignIn = this.onSignIn.bind(this);
-    this.onSignUp = this.onSignUp.bind(this);
-    this.logout = this.logout.bind(this);
   }
 
   /**
@@ -86,7 +71,7 @@ class Home extends Component {
    * 1. Grab state
    * 2. Post req to backend
    */
-  onSignUp() {
+  onSignUp = () => {
     // grab state
     const {
       signUpFirstName,
@@ -130,13 +115,13 @@ class Home extends Component {
           });
         }
       });
-  }
+  };
 
   /**
    * 1. Grab state
    * 2. Post req to backend
    */
-  onSignIn() {
+  onSignIn = () => {
     // grab state
     const { signInEmail, signInPassword } = this.state;
 
@@ -173,9 +158,9 @@ class Home extends Component {
           });
         }
       });
-  }
+  };
 
-  logout() {
+  logout = () => {
     this.setState({
       isLoading: true
     });
@@ -208,47 +193,47 @@ class Home extends Component {
         token: ""
       });
     }
-  }
+  };
 
   /**
    *
    * @param {Where the value of the text box goes} event
    */
-  onTextboxChangeSignInEmail(event) {
+  onTextboxChangeSignInEmail = event => {
     this.setState({
       signInEmail: event.target.value
     });
-  }
+  };
 
-  onTextboxChangeSignInPassword(event) {
+  onTextboxChangeSignInPassword = event => {
     this.setState({
       signInPassword: event.target.value
     });
-  }
+  };
 
-  onTextboxChangeSignUpFirstName(event) {
+  onTextboxChangeSignUpFirstName = event => {
     this.setState({
       signUpFirstName: event.target.value
     });
-  }
+  };
 
-  onTextboxChangeSignUpLastName(event) {
+  onTextboxChangeSignUpLastName = event => {
     this.setState({
       signUpLastName: event.target.value
     });
-  }
+  };
 
-  onTextboxChangeSignUpEmail(event) {
+  onTextboxChangeSignUpEmail = event => {
     this.setState({
       signUpEmail: event.target.value
     });
-  }
+  };
 
-  onTextboxChangeSignUpPassword(event) {
+  onTextboxChangeSignUpPassword = event => {
     this.setState({
       signUpPassword: event.target.value
     });
-  }
+  };
 
   render() {
     const {
@@ -275,61 +260,88 @@ class Home extends Component {
     if (!token) {
       return (
         <>
+          {this.state.showSignIn ? (
+            <div>
+              {/* If there is an error in the sign in, show it. */}
+              {signInError ? <p>{signInError}</p> : null}
+              <p>Sign In</p>
+              <TextField
+                id="standard-email"
+                label="Email"
+                value={signInEmail}
+                placeholder="name@email.com"
+                onChange={this.onTextboxChangeSignInEmail}
+                style={textFieldStyling}
+                margin="normal"
+              />
+              <TextField
+                style={textFieldStyling}
+                id="standard-password-input"
+                label="Password"
+                value={signInPassword}
+                type="password"
+                placeholder="pswd1234"
+                onChange={this.onTextboxChangeSignInPassword}
+                margin="normal"
+              />
+              <br />
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={this.onSignIn}
+              >
+                Sign In
+              </Button>
+            </div>
+          ) : (
+            <div>
+              {/* If there is an error in the sign in, show it. */}
+              {signUpError ? <p>{signUpError}</p> : null}
+              <p>Sign Up</p>
+              <input
+                type="text"
+                placeholder="Danny"
+                value={signUpFirstName}
+                onChange={this.onTextboxChangeSignUpFirstName}
+              />
+              <br />
+              <input
+                type="text"
+                placeholder="Denenberg"
+                value={signUpLastName}
+                onChange={this.onTextboxChangeSignUpLastName}
+              />
+              <br />
+              <input
+                type="email"
+                placeholder="d@gmail.com"
+                value={signUpEmail}
+                onChange={this.onTextboxChangeSignUpEmail}
+              />
+              <br />
+              <input
+                type="password"
+                placeholder="password1234"
+                value={signUpPassword}
+                onChange={this.onTextboxChangeSignUpPassword}
+              />
+              <br />
+              <button onClick={this.onSignUp}>Sign Up</button>
+            </div>
+          )}
           <div>
-            {/* If there is an error in the sign in, show it. */}
-            {signInError ? <p>{signInError}</p> : null}
-            <p>Sign In</p>
-            <input
-              type="email"
-              placeholder="d@gmail.com"
-              value={signInEmail}
-              onChange={this.onTextboxChangeSignInEmail}
-            />
             <br />
-            <input
-              type="password"
-              placeholder="password1234"
-              value={signInPassword}
-              onChange={this.onTextboxChangeSignInPassword}
-            />
             <br />
-            <button onClick={this.onSignIn}>Sign In</button>
-          </div>
-          <br />
-          <br />
-          <div>
-            {/* If there is an error in the sign in, show it. */}
-            {signUpError ? <p>{signUpError}</p> : null}
-            <p>Sign Up</p>
-            <input
-              type="text"
-              placeholder="Danny"
-              value={signUpFirstName}
-              onChange={this.onTextboxChangeSignUpFirstName}
-            />
-            <br />
-            <input
-              type="text"
-              placeholder="Denenberg"
-              value={signUpLastName}
-              onChange={this.onTextboxChangeSignUpLastName}
-            />
-            <br />
-            <input
-              type="email"
-              placeholder="d@gmail.com"
-              value={signUpEmail}
-              onChange={this.onTextboxChangeSignUpEmail}
-            />
-            <br />
-            <input
-              type="password"
-              placeholder="password1234"
-              value={signUpPassword}
-              onChange={this.onTextboxChangeSignUpPassword}
-            />
-            <br />
-            <button onClick={this.onSignUp}>Sign Up</button>
+
+            <Link
+              component="button"
+              color="primary"
+              onClick={() =>
+                this.setState({ showSignIn: !this.state.showSignIn })
+              }
+            >
+              {this.state.showSignIn ? "Sign Up" : "Sign In"}
+            </Link>
           </div>
         </>
       );
@@ -346,4 +358,4 @@ class Home extends Component {
   }
 }
 
-export default Home;
+export default SignIn;
