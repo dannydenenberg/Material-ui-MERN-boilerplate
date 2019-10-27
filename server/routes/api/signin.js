@@ -1,5 +1,10 @@
 const User = require("../../models/User");
 const UserSession = require("../../models/UserSession");
+const mongoose = require("mongoose");
+
+// must execute the following to use User.findOneAndUpdate() function
+mongoose.set("useFindAndModify", false);
+
 module.exports = app => {
   // app.get('/api/counters', (req, res, next) => {
   //   Counter.find()
@@ -20,7 +25,7 @@ module.exports = app => {
   app.post("/api/account/signup", (req, res, next) => {
     const { body } = req;
     const { firstName, lastName, password } = body;
-    let { email } = body; // needs to be mutable unlike above
+    let { email, username } = body; // needs to be mutable unlike above
 
     if (!firstName) {
       return res.send({
@@ -51,12 +56,15 @@ module.exports = app => {
     }
 
     email = email.toLowerCase(); // email should always go in db in lowercase form
+    username = username.toLowerCase(); // username should always go in db in lowercase form
 
     /**
      * Steps:
-     * 1. Verify email doesn't exists
-     * 2. Save
+     * 1. Verify email doesn't exist
+     * 2. Verify username doesn't exist
+     * 2. Save user in DB
      */
+    // check email
     User.find(
       {
         email
@@ -68,31 +76,56 @@ module.exports = app => {
             mes: "Error: Server error."
           });
         } else if (previousUsers.length > 0) {
+          // if someone already is using that email
           return res.send({
             success: false,
             mes: "Error: Account already exists."
           });
         }
 
-        // Save the new user
-        const newUser = new User();
-        newUser.email = email;
-        newUser.firstName = firstName;
-        newUser.lastName = lastName;
-        newUser.password = newUser.generateHash(password);
-        newUser.save((err, user) => {
-          if (err) {
-            return res.send({
-              success: false,
-              mes: "Error: Server error."
+        /* Email wasn't previously used, now check username */
+        User.find(
+          {
+            username
+          },
+          (err, previousUsernameUsers) => {
+            if (err) {
+              return res.send({
+                success: false,
+                mes: "Error: Server error."
+              });
+            } else if (previousUsernameUsers.length > 0) {
+              // if someone already is using that username
+              return res.send({
+                success: false,
+                mes: "Error: Account already exists."
+              });
+            }
+            // Save the new user
+            const newUser = new User();
+            newUser.email = email;
+            newUser.firstName = firstName;
+            newUser.lastName = lastName;
+            newUser.password = newUser.generateHash(password);
+            newUser.username = username;
+            newUser.events = [];
+            newUser.signedUpFor = [];
+
+            newUser.save((err, user) => {
+              if (err) {
+                return res.send({
+                  success: false,
+                  mes: "Error: Server error."
+                });
+              }
+
+              return res.send({
+                success: true,
+                mes: "Signed up."
+              });
             });
           }
-
-          return res.send({
-            success: true,
-            mes: "Signed up."
-          });
-        });
+        );
       }
     );
   });
@@ -144,7 +177,7 @@ module.exports = app => {
          * Check the user's password
          */
         const user = users[0];
-        // if invalid password
+        // if invalid password (defined in the schema)
         if (!user.validPassword(password)) {
           return res.send({
             success: false,
@@ -159,27 +192,29 @@ module.exports = app => {
          * This will verify that they have already successfully logged in.
          * If you feel you need to revoke their access, mark their document to `isDeleted: true`
          */
+        console.log("About to create new UserSession");
         let userSession = new UserSession();
         userSession.userId = user._id;
         userSession.save((err, doc) => {
           if (err) {
+            console.log("error A");
             return res.send({
               success: false,
               mes: "Error: Server error #1."
             });
           }
-
+          console.log("success A");
           return res.send({
             success: true,
             mes: "Valid sign in.",
-            token: doc._id // the _id property that Mongo gives each document by default
+            token: doc._id // the _id property that Mongo gives each document by default used to tell if a user can log in
           });
         });
       }
     );
   });
 
-  app.post("/api/account/verify", (req, res, next) => {
+  app.get("/api/account/verify", (req, res, next) => {
     /**
      * 1. Get the token
      * 2. Verify the token is one of a kind and is not deleted
@@ -188,6 +223,7 @@ module.exports = app => {
     // get token
     const { query } = req;
     const { token } = query; //?token=test
+    console.log(`Token: ${token}`);
 
     // Verify the token is one of a kind and is not deleted
     UserSession.find(
@@ -232,7 +268,7 @@ module.exports = app => {
         $set: { isDeleted: true }
       },
       null,
-      (err, sessions) => {
+      (err, session) => {
         if (err) {
           return res.send({
             success: false,
@@ -241,7 +277,7 @@ module.exports = app => {
         }
 
         // if there aren't any documents found by that token
-        if (sessions.length != 1) {
+        if (!session) {
           return res.send({
             success: false,
             mes: "Error: Invalid token."

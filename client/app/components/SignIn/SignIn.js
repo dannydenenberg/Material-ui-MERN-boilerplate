@@ -4,6 +4,7 @@ import { getFromStorage, setInStorage } from "../../utils/storage";
 import { Button, Link, Typography } from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
+import Account from "../Account/Account";
 
 const localStorageObjectName = "login_system_storage";
 
@@ -19,15 +20,19 @@ class SignIn extends Component {
     this.state = {
       isLoading: true,
       token: "", // if they have a token, they are signed in
+
       signUpError: "",
       signInError: "",
       signInEmail: "",
       signInPassword: "",
+
       signUpFirstName: "",
       signUpLastName: "",
       signUpEmail: "",
       signUpPassword: "",
       signUpError: "",
+      signUpUsername: "",
+
       showSignIn: true
     };
   }
@@ -37,14 +42,20 @@ class SignIn extends Component {
    * Use token to gather user information from DB.
    */
   componentDidMount() {
+    console.log("In component did mount");
     // get the localstorage object
     const obj = getFromStorage(localStorageObjectName);
     if (obj && obj.token) {
       // get token from local storage
       const { token } = obj;
+      console.log(`Token: ${token}`);
 
       // verify token
-      fetch(`/api/account/verify?token=${token}`)
+      fetch(`/api/account/verify?token=${token}`, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
         .then(res => res.json())
         .then(json => {
           if (json.success) {
@@ -77,7 +88,8 @@ class SignIn extends Component {
       signUpFirstName,
       signUpLastName,
       signUpEmail,
-      signUpPassword
+      signUpPassword,
+      signUpUsername
     } = this.state;
 
     this.setState({
@@ -91,6 +103,7 @@ class SignIn extends Component {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
+        username: signUpUsername,
         firstName: signUpFirstName,
         lastName: signUpLastName,
         email: signUpEmail,
@@ -106,7 +119,13 @@ class SignIn extends Component {
             signUpEmail: "",
             signUpPassword: "",
             signUpFirstName: "",
-            signUpLastName: ""
+            signUpLastName: "",
+            signUpUsername: ""
+          });
+
+          // show user the sign in stuff now
+          this.setState({
+            showSignIn: true
           });
         } else {
           this.setState({
@@ -171,7 +190,12 @@ class SignIn extends Component {
       const { token } = obj;
 
       // verify token
-      fetch(`/api/account/logout?token=${token}`)
+      fetch(`/api/account/logout?token=${token}`, {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
         .then(res => res.json())
         .then(json => {
           if (json.success) {
@@ -229,6 +253,12 @@ class SignIn extends Component {
     });
   };
 
+  onTextboxChangeSignUpUsername = event => {
+    this.setState({
+      signUpUsername: event.target.value
+    });
+  };
+
   onTextboxChangeSignUpPassword = event => {
     this.setState({
       signUpPassword: event.target.value
@@ -246,11 +276,12 @@ class SignIn extends Component {
       signUpFirstName,
       signUpLastName,
       signUpEmail,
-      signUpPassword
+      signUpPassword,
+      signUpUsername
     } = this.state;
 
     if (isLoading) {
-      return <p>We are loading...</p>;
+      return <p>Loading...</p>;
     }
 
     /**
@@ -320,6 +351,13 @@ class SignIn extends Component {
               />
               <br />
               <input
+                type="text"
+                placeholder="coolactor12"
+                value={signUpUsername}
+                onChange={this.onTextboxChangeSignUpUsername}
+              />
+              <br />
+              <input
                 type="password"
                 placeholder="password1234"
                 value={signUpPassword}
@@ -350,8 +388,7 @@ class SignIn extends Component {
     return (
       <>
         <div>
-          <p>Account</p>
-          <button onClick={this.logout}>Logout</button>
+          <Account logout={this.logout} />
         </div>
       </>
     );

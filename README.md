@@ -31,18 +31,14 @@ Development (Webpack dev server) mode:
 npm run start:dev
 ```
 
+### Notes about development
+
+- The way I do persistance with user login (keep users logged in even after a refresh) is every time they login, I generate a new UserSession object on the DB that holds the \_id corresponding to the user in the users collection as well as a timestamp of when they logged in. I store the \_id of this usersession object in the localStorage and grab it again when they reload the page to check in the database. When they logout, I set the isDeleted property of the usersession object to true.
+
 ### Todo
 
-[ ] asdf 
-- [ ] asdf 
-- [ ]
-- [ ]
-- [ ]
-- [ ]
-- [ ]
-- [ ]
-- [ ]
-- [ ]
+- [ ] Validate emails, usernames (alphanumerical),
+- [ ] Change login to be username, password (for later)
 
 ### License
 

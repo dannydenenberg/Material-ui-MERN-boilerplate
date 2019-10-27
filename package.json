@@ -43,6 +43,7 @@
     "react-router-dom": "^4.2.2",
     "sass-loader": "^6.0.7",
     "style-loader": "^0.20.3",
+    "typeface-roboto": "0.0.75",
     "webpack": "^4.20.2",
     "webpack-cli": "^3.1.1",
     "webpack-dev-middleware": "^3.0.1",
