@@ -6,7 +6,9 @@ import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
 import Account from "../Account/Account";
 
-const localStorageObjectName = "login_system_storage";
+export function localStorageObjectName() {
+  return "tryout_token"; // name of the object where login token is stored
+}
 
 const textFieldStyling = {
   margin: 8
@@ -44,7 +46,7 @@ class SignIn extends Component {
   componentDidMount() {
     console.log("In component did mount");
     // get the localstorage object
-    const obj = getFromStorage(localStorageObjectName);
+    const obj = getFromStorage(localStorageObjectName());
     if (obj && obj.token) {
       // get token from local storage
       const { token } = obj;
@@ -162,7 +164,7 @@ class SignIn extends Component {
       .then(res => res.json())
       .then(json => {
         if (json.success) {
-          setInStorage(localStorageObjectName, { token: json.token });
+          setInStorage(localStorageObjectName(), { token: json.token });
           this.setState({
             signInError: json.mes,
             isLoading: false,
@@ -184,7 +186,7 @@ class SignIn extends Component {
       isLoading: true
     });
     // get the localstorage object
-    const obj = getFromStorage(localStorageObjectName);
+    const obj = getFromStorage(localStorageObjectName());
     if (obj && obj.token) {
       // get token from local storage
       const { token } = obj;
