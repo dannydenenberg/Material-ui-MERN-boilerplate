@@ -12,7 +12,7 @@ export function localStorageObjectName() {
 
 const textFieldStyling = {
   margin: 8
-};
+}; //
 
 // The reason I use all arrow functions is b/c you don't have to bind them!
 class SignIn extends Component {
