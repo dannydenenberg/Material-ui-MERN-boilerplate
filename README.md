@@ -1,6 +1,6 @@
-# Tryouts
+# Material-ui-MERN-boilerplate
 
-This is a project to manage auditions using the following technologies:
+This project makes building responsive login systems with MERN a breeze using these technologies: 
 
 - [React](https://facebook.github.io/react/) and [React Router](https://reacttraining.com/react-router/) for the frontend
 - [Express](http://expressjs.com/) and [Mongoose](http://mongoosejs.com/) for the backend
