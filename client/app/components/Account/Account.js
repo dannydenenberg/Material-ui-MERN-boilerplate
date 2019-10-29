@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Typography, Button } from "@material-ui/core";
-import { localStorageObjectName } from "./../SignIn/SignIn";
+import { localStorageObjectName } from "../SignInOld/SignIn";
 import { getFromStorage } from "./../../utils/storage";
 import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 

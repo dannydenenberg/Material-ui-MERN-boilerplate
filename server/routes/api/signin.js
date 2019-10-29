@@ -20,7 +20,7 @@ module.exports = app => {
   // });
 
   /**
-   * SIgn up
+   * Sign up
    */
   app.post("/api/account/signup", (req, res, next) => {
     const { body } = req;

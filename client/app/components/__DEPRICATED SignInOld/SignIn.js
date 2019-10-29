@@ -32,7 +32,6 @@ class SignIn extends Component {
       signUpLastName: "",
       signUpEmail: "",
       signUpPassword: "",
-      signUpError: "",
       signUpUsername: "",
 
       showSignIn: true

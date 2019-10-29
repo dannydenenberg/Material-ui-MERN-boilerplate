@@ -39,6 +39,8 @@ npm run start:dev
 
 - [ ] Validate emails, usernames (alphanumerical),
 - [ ] Change login to be username, password (for later)
+- [ ] Add email verification (for later)
+- [ ] Setup 'forgot my password' on sign in page
 
 ### License
 
